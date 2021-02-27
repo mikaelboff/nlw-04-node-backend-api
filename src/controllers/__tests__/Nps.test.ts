@@ -1,8 +1,8 @@
 import request from "supertest";
-import { app } from "../app";
-import createConnection from "../database";
+import { app } from "../../app";
+import createConnection from "../../database";
 
-describe("Users", () => {
+describe("Nps", () => {
   beforeAll(async () => {
     const connection = await createConnection();
     await connection.runMigrations();
@@ -14,11 +14,12 @@ describe("Users", () => {
     await connection.close();
   });
 
-  it("Should be able to create a new user", async () => {
+  it("Should not be able to calculate nps if survey user does not exist", async () => {
     const response = await request(app)
-      .post("/users")
-      .send({ email: "mikael@gmail.com", name: "Mikael Boff" });
+      .get("/nps/asdf")
+      .send();
 
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Survey User does not exists!");
   });
 });

@@ -1,6 +1,7 @@
 import { resolve } from "path";
 import { Request, Response } from "express";
 import { getCustomRepository } from "typeorm";
+import * as yup from "yup";
 import { AppError } from "../errors/AppError";
 import { SurveyRepository } from "../repositories/SurveyRepository";
 import { SurveysUsersRepository } from "../repositories/SurveysUsersRepository";
@@ -10,6 +11,20 @@ import SendMailService from "../services/SendMailService";
 export class SendMailController {
   async execute(req: Request, res: Response) {
     const { email, survey_id } = req.body;
+
+    const schema = yup.object().shape({
+      survey_id: yup.string().required("Survey identifier is not valid"),
+      email: yup
+        .string()
+        .email()
+        .required("E-mail is not valid")
+    });
+
+    try {
+      await schema.validate(req.body, { abortEarly: false });
+    } catch (e) {
+      throw new AppError(e.errors);
+    }
 
     const userRepository = getCustomRepository(UserRepository);
     const surveyRepository = getCustomRepository(SurveyRepository);

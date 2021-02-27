@@ -9,11 +9,11 @@ export class UserController {
     const { name, email } = req.body;
 
     const schema = yup.object().shape({
-      name: yup.string().required(),
+      name: yup.string().required("Name is not valid"),
       email: yup
         .string()
         .email()
-        .required()
+        .required("E-mail is not valid")
     });
 
     try {

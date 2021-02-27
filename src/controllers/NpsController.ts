@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { IsNull, Not, getCustomRepository } from "typeorm";
+import * as yup from "yup";
 import { AppError } from "../errors/AppError";
 import { SurveysUsersRepository } from "../repositories/SurveysUsersRepository";
-
 export class NpsController {
   /**
    * Cálculo NPS
@@ -22,11 +22,11 @@ export class NpsController {
       value: Not(IsNull())
     });
 
-    if (!answersResponse) {
+    const [surveys, answersCount] = answersResponse;
+
+    if (!answersCount) {
       throw new AppError("Survey User does not exists!");
     }
-
-    const [surveys, answersCount] = answersResponse;
 
     const detractors = surveys.filter(
       survey => survey.value >= 0 && survey.value <= 6
